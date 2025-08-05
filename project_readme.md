@@ -25,7 +25,7 @@ Objectives
 | Automation | Scheduled daily via `cron` to ensure continuous monitoring. |
 | Security | Audits log files for authentication failures and suspicious activities. |
 
-Project Structur
+Project Structure
 myproject/
 ├── docs/
 │ ├── project_readme.md # ← This documentation
@@ -101,10 +101,57 @@ Add the following line:
 ________________________________________
 
 Email Configuration
-Ensure you have mailutils installed:
+Ensure you have msmtp instaledd:
 sudo apt update
-sudo apt install mailutils
-Then configure your MTA (postfix, sendmail, or similar) to enable sending emails.
+sudo apt install msmtp
+Then configure your msmpt like below
+
+🔹 Step 1: Create Gmail App Password
+1.	Go to: https://myaccount.google.com/apppasswords
+2.	Sign in and enable 2-Step Verification (if not already enabled).
+3.	Generate a new App Password:
+o	Select App: Mail
+o	Select Device: Other (custom name) — you can name it "Ubuntu"
+o	Click Generate
+o	Copy the 16-character password Google gives you.
+
+🔹 Step 2: Install msmtp and configure Gmail SMTP
+sudo apt install msmtp
+Create your config file:
+nano ~/.msmtprc
+Paste the following (replace with your actual Gmail address and app password):
+defaults
+auth           on
+tls            on
+tls_trust_file /etc/ssl/certs/ca-certificates.crt
+logfile        ~/.msmtp.log
+
+account        gmail
+host           smtp.gmail.com
+port           587
+from           yourgmail@gmail.com
+user           yourgmail@gmail.com
+password       your_app_password
+
+account default: gmail
+Save and exit (Ctrl + O, then Enter, then Ctrl + X)
+Set secure permissions:
+chmod 600 ~/.msmtprc
+
+🔹 Step 3: Link mail to use msmtp
+Create or edit this file:
+nano ~/.mailrc
+Add:
+set sendmail="/usr/bin/msmtp"
+set use_from=yes
+set realname="System Alert"
+set from="yourgmail@gmail.com"
+
+🔹 Step 4: Test Sending Email
+Try this:
+echo "System check passed!" | msmtp "✅ Ubuntu Test Email" your-other-email@gmail.com
+Check your inbox/spam folder.
+
 ________________________________________
 
 Output Samples
@@ -117,7 +164,7 @@ ________________________________________
 Requirements
 •	A Linux system with /var/log/auth.log and /var/log/syslog
 •	Bash shell
-•	mailutils for sending email alerts
+•	smstp for sending email alerts
 •	Cron service enabled for automation
 ________________________________________
 
