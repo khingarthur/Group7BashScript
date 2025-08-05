@@ -36,7 +36,7 @@ send_email() {
 
     if [ "$count" -gt 0 ]; then
         echo "$DATE - Issues found. Sending email to $EMAIL" >> "$LOG"
-        mail -s "Log Alert on $HOST" "$EMAIL" < "$REPORT"
+        echo -e "Subject: Log Alert on $HOST\n\n$(cat "$REPORT")" | msmtp "$EMAIL"
 
     else
         echo "$DATE - No critical issues found." >> "$LOG"
